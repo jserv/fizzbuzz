@@ -2,8 +2,9 @@
 #include <string.h>
 
 /*
- * Based on the way printf handles strings, we can use a single string for
- * every kind of thing we want to print, in power of two lengths.
+ * Based on the way printf manipulating format strings, we can specify
+ * a single string for each kind of thing we want to print, in power of
+ * two lengths.
  *
  * For a single integer, "%u" length == 2
  * For fizz or buzz, "fizz" or "buzz" length == 4
