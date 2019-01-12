@@ -1,5 +1,7 @@
-all:
-	gcc -o bitwise -Wall bitwise.c
+all: bitwise
+
+bitwise: bitwise.c
+	gcc -o $@ -Wall $^
 
 clean:
 	rm -f bitwise out
