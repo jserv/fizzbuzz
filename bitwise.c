@@ -1,3 +1,5 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -19,33 +21,27 @@
 
 #define MSG_LEN 8
 
-#define DIV5(x) ((x & 2) >> 1)
-#define DIV3(x) (x & 1)
+static inline bool is_divisible(uint32_t n, uint64_t M)
+{
+    return n * M <= M - 1;
+}
+
+static uint64_t M3 = UINT64_C(0xFFFFFFFFFFFFFFFF) / 3 + 1;
+static uint64_t M5 = UINT64_C(0xFFFFFFFFFFFFFFFF) / 5 + 1;
 
 int main(int argc, char **argv)
 {
     for (size_t i = 1; i <= 100; i++) {
-        /* Define mask/flags for storing divisibility */
-        unsigned int mask = 0;
-
-        /* Create bitmask of the form 000000ab
-           a - divisible by 5
-           b - divisible by 3 */
-        mask |= (!(i % 5) << 1) | !(i % 3);
-
-        unsigned int start =
-            // Shift down 1 if div5
-            (MSG_LEN >> DIV5(mask))
-            // Shift down another 4 if div3 */
-            >> (DIV3(mask) << 2);
-
-        // Default length is 2
-        // Shift up by one for each bit set
-        unsigned int length = (2 << (DIV3(mask))) << DIV5(mask);
-        // Shift up by 1 for each bit set
+        uint8_t div3 = is_divisible(i, M3);
+        uint8_t div5 = is_divisible(i, M5);
+        unsigned int length = (2 << div3) << div5;
+        /* default length is 2 and shift up by one for each bit set */
 
         char fmt[MSG_LEN + 1];
-        strncpy(fmt, &"FizzBuzz%u"[start], length);
+        strncpy(fmt, &"FizzBuzz%u"[(MSG_LEN >> div5) >> (div3 << 2)], length);
+        /*                           [--------]             [----]
+         *                 Shift down 1 if div5   Shift down another 4 if div3
+         */
         fmt[length] = '\0';
 
         printf(fmt, i);
